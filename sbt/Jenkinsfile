@@ -1,0 +1,74 @@
+def tag = null
+node('master') {
+    stage('Checkout'){
+        def branch = checkout(scm).GIT_BRANCH - 'origin/'
+        if (branch == 'master') {
+            tag = "latest"
+        } else {
+            tag = branch
+        }
+    }
+}
+
+pipeline {
+
+    environment {
+        registry = "https://devcognira.azurecr.io"
+        registryCredential = "docker-login"
+    }
+
+    agent none
+	
+    stages {
+        stage ("Build Image") {
+            agent any
+            steps {
+                echo "BUILDING SBT IMAGE ..."
+                script {
+                    docker.withRegistry(registry, registryCredential) {
+                        sbtImage = docker.build("devcognira.azurecr.io/cognira/sbt:${tag}", "${WORKSPACE}/")
+                    }
+                }
+            }
+        }
+        stage ("Test Image") {
+            parallel {
+                stage ("Test Agent") {
+                    agent {
+                        docker { 
+                            image "devcognira.azurecr.io/cognira/sbt:${tag}" 
+                            args '-v sbt-data:/root/.ivy2 -v ${WORKSPACE}/:/opt -w /opt -u root:root'
+                        }
+                    } 
+                    steps {
+                        echo "TESTING SBT IMAGE USING AGENT ... "
+                        sh 'sbt sbtVersion'
+                    }
+                }
+                stage ("Test Docker Plugin") {
+                    agent any
+                    steps {
+                        echo "TESTING SBT IMAGE WITH DOCKER PLUGIN ..."
+                        script {
+                            sbtImage.inside('-v sbt-data:/root/.ivy2 -v ${WORKSPACE}/:/opt -w /opt -u root:root') {
+                                sh 'sbt sbtVersion'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        stage ("Publish Image") {
+            agent any
+            steps {
+                echo "Publishing ..."
+                script {
+                    docker.withRegistry(registry, registryCredential) {
+                        sbtImage.push()
+                    }
+                }
+            }
+        }
+    }
+}
+
