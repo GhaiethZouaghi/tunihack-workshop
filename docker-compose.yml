@@ -1,0 +1,32 @@
+version: "3"
+services:
+  studentapi:
+    image: ghaiethzouaghi/studentapi:tunihack
+    build:
+      context: studentapi
+      dockerfile: studentapi.Dockerfile
+    entrypoint: bash -c "/opt/target/pack/bin/server"
+    ports:
+      - "9000:9000"
+    expose:
+      - "9000"
+    networks:
+      - tunihack-network 
+      
+  teacherapi:
+    image: ghaiethzouaghi/teacherapi:tunihack
+    build:
+      context: teacherapi
+      dockerfile: teacherapi.Dockerfile
+    entrypoint: bash -c "/opt/target/pack/bin/server"
+    ports:
+      - "9001:9001"
+    expose:
+      - "9001"
+    networks:
+      - tunihack-network 
+
+networks:
+  tunihack-network:
+    external:
+      name: tunihack-network

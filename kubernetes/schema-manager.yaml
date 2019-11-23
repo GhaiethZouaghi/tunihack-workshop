@@ -1,0 +1,13 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: schemamanager
+  namespace: tunihack
+spec:
+  template:
+    spec:
+      containers:
+      - name: schemamanager
+        image: ghaiethzouaghi/schema-manager:tunihack
+        imagePullPolicy: Always
+      restartPolicy: Never

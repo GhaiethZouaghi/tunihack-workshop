@@ -1,0 +1,13 @@
+version: '3'
+services:
+  sbt:
+    image: cognira/sbt
+    volumes:
+      - sbt-data:/root/.ivy2
+      - .:/opt
+    working_dir: /opt
+    
+volumes:
+  sbt-data:
+    external:
+      name: sbt-data

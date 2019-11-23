@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: studentapi
+  namespace: tunihack
+spec:
+  selector:
+    matchLabels:
+      app: studentapi
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: studentapi
+    spec:
+      containers:
+      - name: studentapi
+        image: ghaiethzouaghi/studentapi:tunihack
+        command: ["/bin/bash"]
+        args: ["-c","/opt/target/pack/bin/server"]
+        ports:
+        - containerPort: 9000
+        imagePullPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: student-service
+  namespace: tunihack
+  labels:
+    name: student-service
+spec:
+  type: NodePort
+  ports:
+  - name: http
+    nodePort: 30000
+    port: 9000
+  selector:
+    app: studentapi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: teacherapi
+  namespace: tunihack
+spec:
+  selector:
+    matchLabels:
+      app: teacherapi
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: teacherapi
+    spec:
+      containers:
+      - name: teacherapi
+        image: ghaiethzouaghi/teacherapi:tunihack
+        command: ["/bin/bash"]
+        args: ["-c","/opt/target/pack/bin/server"]
+        ports:
+        - containerPort: 9001
+        imagePullPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: teacher-service
+  namespace: tunihack
+  labels:
+    name: teacher-service
+spec:
+  type: NodePort
+  ports:
+  - name: http
+    nodePort: 30001
+    port: 9001
+  selector:
+    app: teachertapi

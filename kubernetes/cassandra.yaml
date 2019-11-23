@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cassandradb
+  namespace: tunihack
+spec:
+  selector:
+    matchLabels:
+      app: cassandradb
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: cassandradb
+    spec:
+      containers:
+      - name: cassandradb
+        image: cassandra
+        ports:
+        - containerPort: 9042
+        imagePullPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cassandra
+  namespace: tunihack
+spec:
+  ports:
+  - protocol: TCP
+    port: 9042
+  selector:
+    app: cassandradb

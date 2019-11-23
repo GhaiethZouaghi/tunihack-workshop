@@ -1,0 +1,18 @@
+version: '3'
+
+services:
+  cassandra:
+    image: cassandra
+    environment:
+      DS_LICENSE: accept
+    ports:
+      - "9042:9042"
+    expose:
+      - "9042"
+    networks:
+      - tunihack-network 
+
+networks:
+  tunihack-network:
+    external:
+      name: tunihack-network
