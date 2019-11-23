@@ -1,3 +1,10 @@
+# Requirements
+
+1. Docker and Docker-Compose
+2. Minikube
+3. Kubectl
+4. Postman
+
 # Docker Demo
 
 ## Dockerfile Hello World
